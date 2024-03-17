@@ -179,7 +179,7 @@ def bit_resnet50x1(*a, **kw):
     return ResNetV2([3, 4, 6, 3], 1, zero_head=True, *a, **kw)
 
 def bit_resnet152x2(*a, **kw):
-    return ResNetV2([3, 8, 36, 3], 2, zero_head=True, *a, **kw)
+    return ResNetV2([3, 8, 36, 3], 2, zero_head=False, *a, **kw)
 
 KNOWN_MODELS = OrderedDict([
     ('BiT-M-R50x1', lambda *a, **kw: ResNetV2([3, 4, 6, 3], 1, *a, **kw)),

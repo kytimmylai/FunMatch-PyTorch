@@ -9,7 +9,14 @@ Reference:
 3. https://pytorch.org/blog/how-to-train-state-of-the-art-models-using-torchvision-latest-primitives/
 
 ## Progress
-[24/03/03] PyTorch implementation
+- [24/03/03] PyTorch implementation
+
+- [24/03/17] 
+    * It's the MOST significant method across all knowledge distillation methods that I've tried before, It makes a great improvement in my other projects. I will try to do comprehensive research on it.
+    * I also tried torch.compile but encountered some error when use torchrun/distributed.launch. It's faster but still not feasible so far.
+    * I noticed that tensor flag is False after PyTorch 1.12 and set it as True in the code.
+    * It should be applied in every image classification, and I would like to write a general one.
+
 
 ### TODO
 
@@ -24,7 +31,7 @@ Reference:
 | [Food101](https://www.vision.ee.ethz.ch/datasets_extra/food-101/) | BiT-ResNet50x1 (1000 epochs) |       N/A      	| 
 
 - [x] Add requirements
-- [ ] Align the procedure to the TF version
+- [x] Align the procedure to the TF version
 - [ ] Reproduce a similar result on a dataset
 - [ ] Revision
 - [ ] Add Shampoo

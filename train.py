@@ -23,6 +23,12 @@ from loss_fn import create_optimizer
 from resnetv2 import bit_resnet152x2
 import numpy as np
 
+def kl_divergence(prediction, target):
+    true_prob = nn.functional.softmax(target, dim=1)
+    loss = nn.functional.cross_entropy(prediction, target=true_prob, reduction='none') \
+        - nn.functional.cross_entropy(target, target=true_prob, reduction='none')
+    return loss.mean()
+
 def train_one_epoch(
     model, 
     criterion, 
@@ -36,6 +42,9 @@ def train_one_epoch(
     scaler=None
 ):
     model.train()
+    if teacher_model is not None:
+        teacher_model.eval()
+
     metric_logger = MetricLogger(delimiter="  ")
     metric_logger.add_meter("lr", SmoothedValue(window_size=1, fmt="{value}"))
 
@@ -44,13 +53,12 @@ def train_one_epoch(
         image, target = image.to(device), target.to(device)
         
         if teacher_model is not None:
-            teacher_model.eval()
             with torch.no_grad():
                 target = teacher_model(image)
         with torch.cuda.amp.autocast(enabled=scaler is not None):
             output = model(image)
-            loss = criterion(output, target)
-            
+            #loss = criterion(output, target)
+            loss = kl_divergence(output, target)
 
         optimizer.zero_grad()
         if scaler is not None:
@@ -141,7 +149,6 @@ def main(args):
     num_classes, data_loader, data_loader_test, train_sampler = create_dataloader(args)
     model, parameters = create_model(args, device, num_classes)
 
-    # TODO write a function to modify output layer
     teacher_model = bit_resnet152x2()
     teacher_model.load_from(np.load('BiT-S-R152x2.npz'))
     teacher_model = teacher_model.to(device)
@@ -421,5 +428,8 @@ if __name__ == "__main__":
     mixup: uniform(0, 1)
     inception-style crop
     """
+    print('HUH')
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32 = True
     args = get_args_parser().parse_args()
     main(args)
